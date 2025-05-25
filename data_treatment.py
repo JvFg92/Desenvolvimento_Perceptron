@@ -19,7 +19,7 @@ def load_data():
   X = iris.data
   y = iris.target
 
-  y = np.where(y == 0.0, 1.0, 0.0)  
+  y = np.where(y == 0.0, 1.0, -1.0)  
 
   #Convert to binary classification problem
   X = X[:, :2]
@@ -76,6 +76,10 @@ def plot_data(X_train, y_train, X_test, y_test):
     plt.show()
 
 #################################################################
+
+"""
+    This function plots the decision boundary of the trained model.
+"""
 
 def plot_decision_boundary(X, y, weights):
     plt.figure(figsize=(10, 6))

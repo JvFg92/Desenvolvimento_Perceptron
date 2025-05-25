@@ -12,6 +12,7 @@ lib.train_perceptron.restype = ctypes.c_double
 
 #This function trains the perceptron model.
 def learning(X, y, epochs=30, lr=0.1):
+
     n_samples, n_features = X.shape
     X_bias = np.hstack((np.ones((n_samples, 1)), X))
     weights = np.zeros(X_bias.shape[1], dtype=np.double)
@@ -27,13 +28,3 @@ def learning(X, y, epochs=30, lr=0.1):
             )
 
     return weights, error
-
-if __name__ == "__main__":
-    print("Starting training...")
-    # Load the data:
-    X_train, y_train, X_test, y_test = dt.load_data()
-  
-    weights, error = learning(X_train, y_train)
-    print("Training completed.")
-    print("Training error:", error)
-    print("Final weights:", weights)
