@@ -10,11 +10,30 @@ lib.perceptron.restype = ctypes.c_double
 lib.train_perceptron.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_double, ctypes.c_double]
 lib.train_perceptron.restype = ctypes.c_double
 
-# Load the data:
-X_train, y_train, X_test, y_test = dt.load_data()
-print("X_train shape:", X_train.shape)
-print("y_train shape:", y_train.shape)
-print("X_test shape:", X_test.shape)
-print("y_test shape:", y_test.shape)
+#This function trains the perceptron model.
+def learning(X, y, epochs=30, lr=0.1):
+    n_samples, n_features = X.shape
+    X_bias = np.hstack((np.ones((n_samples, 1)), X))
+    weights = np.zeros(X_bias.shape[1], dtype=np.double)
 
-dt.plot_data(X_train, y_train, X_test, y_test)
+    for epoch in range(epochs):
+        for xi, target in zip(X_bias, y):
+            error=lib.train_perceptron(
+                xi.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+                weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),
+                len(xi),
+                target, 
+                lr
+            )
+
+    return weights, error
+
+if __name__ == "__main__":
+    print("Starting training...")
+    # Load the data:
+    X_train, y_train, X_test, y_test = dt.load_data()
+  
+    weights, error = learning(X_train, y_train)
+    print("Training completed.")
+    print("Training error:", error)
+    print("Final weights:", weights)

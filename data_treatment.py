@@ -19,7 +19,7 @@ def load_data():
   X = iris.data
   y = iris.target
 
-  y = np.where(y == 0, 1, -1)  
+  y = np.where(y == 0.0, 1.0, 0.0)  
 
   #Convert to binary classification problem
   X = X[:, :2]
