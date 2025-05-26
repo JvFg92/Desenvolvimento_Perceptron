@@ -8,8 +8,9 @@
  * @return double The weighted sum of the inputs.
  */
 
-double perceptron(double *x, double *w, int n){
+double perceptron(double *x, double *w){
   double sum = 0.0;
+  int n = sizeof(x) / sizeof(x[0]);
   for (int i = 0; i < n; i++) {
     sum += x[i] * w[i];
   }
@@ -34,18 +35,20 @@ int activation_function(double sum) {
  *
  * @param x Pointer to the input vector.
  * @param w Pointer to the weight vector.
- * @param n The number of inputs.
  * @param target The target output for training.
  * @param learning_rate The learning rate for weight updates.
  */
 
-double train_perceptron(double *x, double *w, int n, double target, double learning_rate) {
-  double output = perceptron(x, w, n);
-  double error = target - output;
-
-  for (int i = 0; i < n; i++) {
+double train_perceptron(double *x, double *w, double target, double learning_rate) {
+  double output = perceptron(x, w);
+  int n = sizeof(x) / sizeof(x[0]);
+  if(output!=target){
+    double error = target - output;
+    for (int i = 0; i < n; i++) {
     w[i] += learning_rate * error * x[i];
+    }
+    return error;
   }
-  return error;
+  return 0.0;
 }
 

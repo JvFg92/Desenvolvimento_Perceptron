@@ -13,7 +13,7 @@ import numpy as np
       X_test: Testing features
       y_test: Testing labels
 """
-def load_data():
+def load_data(test=False):
 
   iris = load_iris()
   X = iris.data
@@ -32,7 +32,8 @@ def load_data():
   X_test_c = X_test.astype(np.double)
   y_test_c = y_test.astype(np.double)
 
-  return X_train_c, y_train_c, X_test_c, y_test_c
+  if test: return X_test_c, y_test_c
+  return X_train_c, y_train_c
 
 #################################################################
 
