@@ -1,5 +1,6 @@
 import ctypes
 import data_treatment as dt
+from sklearn.metrics import accuracy_score
 import numpy as np
 
 #Using ctypes to load the shared library
