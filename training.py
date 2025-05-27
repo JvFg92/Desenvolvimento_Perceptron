@@ -14,7 +14,14 @@ lib.fit.restype = ctypes.c_double
 #################################################################
 
 class Perceptron:
-    def __init__(self,lr=0.1):
+    def __init__(self,lr=0.1, accuracy=0.9):
+        """
+        Initializes the Perceptron model with a learning rate and accuracy threshold.
+        Args:
+            lr (float): Learning rate for weight updates.
+            accuracy (float): Desired accuracy threshold for training.
+        """
+        self.accuracy = accuracy
         self.lr = lr
         self.weights = None
     
