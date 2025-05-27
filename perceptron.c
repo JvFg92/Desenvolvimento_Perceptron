@@ -8,7 +8,7 @@
  * @return double The weighted sum of the inputs.
  */
 
-double perceptron(double *x, double *w){
+double neuron(double *x, double *w){
   double sum = 0.0;
   int n = sizeof(x) / sizeof(x[0]);
   for (int i = 0; i < n; i++) {
@@ -39,8 +39,8 @@ int activation_function(double sum) {
  * @param learning_rate The learning rate for weight updates.
  */
 
-double train_perceptron(double *x, double *w, double target, double learning_rate) {
-  double output = perceptron(x, w);
+double synapse(double *x, double *w, double target, double learning_rate) {
+  double output = neuron(x, w);
   int n = sizeof(x) / sizeof(x[0]);
   if(output!=target){
     double error = target - output;
