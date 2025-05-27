@@ -26,7 +26,7 @@ double neuron(double *x, double *w){
  */
 
 int activation_function(double sum) {
-  return (sum >= 0) ? 1 : 0; 
+  return (sum >= 0) ? 1 : 0;
 }
 
 /*******************************************************************************/
@@ -39,16 +39,15 @@ int activation_function(double sum) {
  * @param learning_rate The learning rate for weight updates.
  */
 
-double synapse(double *x, double *w, double target, double learning_rate) {
-  double output = neuron(x, w);
+double fit(double *x, double *w, double target, double learning_rate) {
   int n = sizeof(x) / sizeof(x[0]);
+  double output = neuron(x, w);
   if(output!=target){
     double error = target - output;
     for (int i = 0; i < n; i++) {
-    w[i] += learning_rate * error * x[i];
+      w[i] += learning_rate * error * x[i];
     }
     return error;
   }
   return 0.0;
 }
-

@@ -6,6 +6,6 @@
 
 int activation_function(double sum);
 double neuron(double *x, double *w);
-double synapse(double *x, double *w, double target, double learning_rate);
+double fit(double *x, double *w, double target, double learning_rate);
 
 #endif // PERCEPTRON_H

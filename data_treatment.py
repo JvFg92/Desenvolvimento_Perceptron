@@ -44,7 +44,7 @@ def load_data(test=False):
 
 #################################################################
 
-"""_summary_
+"""
   This function generates a synthetic dataset for binary classification,
   splits it into training and testing sets, and returns them.
   Returns:
@@ -89,9 +89,9 @@ def plot_data(X_train, y_train, X_test, y_test):
 
     plt.figure(figsize=(10, 6))
     plt.scatter(X_train[y_train == 1][:, 0], X_train[y_train == 1][:, 1], color='blue', label='Class 1 (Train)')
-    plt.scatter(X_train[y_train == -1][:, 0], X_train[y_train == -1][:, 1], color='red', label='Class -1 (Train)')
+    plt.scatter(X_train[y_train == 0][:, 0], X_train[y_train == 0][:, 1], color='red', label='Class 0 (Train)')
     plt.scatter(X_test[y_test == 1][:, 0], X_test[y_test == 1][:, 1], color='cyan', label='Class 1 (Test)', marker='x')
-    plt.scatter(X_test[y_test == -1][:, 0], X_test[y_test == -1][:, 1], color='orange', label='Class -1 (Test)', marker='x')
+    plt.scatter(X_test[y_test == 0][:, 0], X_test[y_test == 0][:, 1], color='orange', label='Class 0 (Test)', marker='x')
     plt.title('Training and Testing Data')
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
