@@ -4,33 +4,36 @@ from sklearn.datasets import make_classification
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
-  This function loads the iris dataset, converts it to a binary classification problem,
-  and splits it into training and testing sets.
-  Returns:
-      X_train: Training features
-      y_train: Training labels
-      X_test: Testing features
-      y_test: Testing labels
-"""
-def load_data(test=False):
 
+def import_data(test=False):
+  """
+    This function loads the iris dataset, converts it to a binary classification problem,
+    and splits it into training and testing sets.
+    Returns:
+        X_train: Training features
+        y_train: Training labels
+        X_test: Testing features
+        y_test: Testing labels
+  """
+  
   iris = load_iris()
   X = iris.data
   y = iris.target
+  #print("Original y:", y)
+  #print("Original X:", X)
 
-  y = np.where(y == 0.0, 1.0, -1.0)  
+  y = np.where(y == 0.0, 1.0, 0.0)  
 
   #Convert to binary classification problem
-  X = X[:, :2]
-  X = (X - X.mean(axis=0)) / X.std(axis=0)
+  X = X[:, :2] # Using only the first two features as before
+  X = (X - X.mean(axis=0)) / X.std(axis=0) # Scaling features as before
 
   #Split the dataset into training and testing sets
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
   X_train_c = X_train.astype(np.double)
-  y_train_c = y_train.astype(np.double)
+  y_train_c = y_train.astype(np.double) # y_train will now contain 0.0 and 1.0
   X_test_c = X_test.astype(np.double)
-  y_test_c = y_test.astype(np.double)
+  y_test_c = y_test.astype(np.double)   # y_test will now contain 0.0 and 1.0
 
   """
   print("X_train", X_train)
@@ -41,44 +44,6 @@ def load_data(test=False):
 
   if test: return X_test_c, y_test_c
   return X_train_c, y_train_c
-
-#################################################################
-
-"""
-  This function generates a synthetic dataset for binary classification,
-  splits it into training and testing sets, and returns them.
-  Returns:
-      X_train: Training features
-      y_train: Training labels
-      X_test: Testing features
-      y_test: Testing labels
-"""
-def generate_linear_data(test=False,n_samples=100):
-    X, y = make_classification(
-        n_samples=n_samples, 
-        n_features=2, 
-        n_redundant=0, 
-        n_informative=2, 
-        n_clusters_per_class=1,
-        class_sep=2.0,  
-        random_state=42
-    )
-    y = y.astype(np.float64)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    X_train_c = X_train.astype(np.double)
-    y_train_c = y_train.astype(np.double)
-    X_test_c = X_test.astype(np.double)
-    y_test_c = y_test.astype(np.double)
-
-    """
-    print("X_train", X_train)
-    print("y_train", y_train)
-    print("X_test", X_test)
-    print("y_test", y_test)
-    """
-
-    if test: return X_test_c, y_test_c
-    return X_train_c, y_train_c
 
 #################################################################
 
