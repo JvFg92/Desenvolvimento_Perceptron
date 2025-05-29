@@ -7,6 +7,7 @@
  * @param w Pointer to the weight vector.
  * @param n Integer number of iterations
  * @return double The weighted sum of the inputs.
+ * Bias is included in the x vector and supported.
  */
 
 double neuron(double *x, double *w, int n){
@@ -25,7 +26,7 @@ double neuron(double *x, double *w, int n){
  * @return int The output of the perceptron (0 or 1).
  */
 
-int activation_function(double sum) {
+double activation_function(double sum) {
   return (sum >= 0) ? 1 : 0;
 }
 
@@ -48,7 +49,7 @@ double fit(double *x, double *w, double target, double learning_rate, int n) {
     for (int i = 0; i < n; i++) {
       w[i] += learning_rate * error * x[i];
     }
-    return error;
+    return abs(error);
   }
   return 0.0;
 }

@@ -1,6 +1,5 @@
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_classification
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -46,45 +45,57 @@ def import_data(test=False):
   return X_train_c, y_train_c
 
 #################################################################
-
-"""
-  This function plots the training and testing data.
-"""
 def plot_data(X_train, y_train, X_test, y_test):
+  """
+  This function plots the training and testing data.
+  """
 
-    plt.figure(figsize=(10, 6))
-    plt.scatter(X_train[y_train == 1][:, 0], X_train[y_train == 1][:, 1], color='blue', label='Class 1 (Train)')
-    plt.scatter(X_train[y_train == 0][:, 0], X_train[y_train == 0][:, 1], color='red', label='Class 0 (Train)')
-    plt.scatter(X_test[y_test == 1][:, 0], X_test[y_test == 1][:, 1], color='cyan', label='Class 1 (Test)', marker='x')
-    plt.scatter(X_test[y_test == 0][:, 0], X_test[y_test == 0][:, 1], color='orange', label='Class 0 (Test)', marker='x')
-    plt.title('Training and Testing Data')
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.legend()
-    plt.show()
+  plt.figure(figsize=(10, 6))
+  plt.scatter(X_train[y_train == 1][:, 0], X_train[y_train == 1][:, 1], color='blue', label='Class 1 (Train)')
+  plt.scatter(X_train[y_train == 0][:, 0], X_train[y_train == 0][:, 1], color='red', label='Class 0 (Train)')
+  plt.scatter(X_test[y_test == 1][:, 0], X_test[y_test == 1][:, 1], color='cyan', label='Class 1 (Test)', marker='x')
+  plt.scatter(X_test[y_test == 0][:, 0], X_test[y_test == 0][:, 1], color='orange', label='Class 0 (Test)', marker='x')
+  plt.title('Training and Testing Data')
+  plt.xlabel('Feature 1')
+  plt.ylabel('Feature 2')
+  plt.legend()
+  plt.show()
 
 #################################################################
-
-"""
-    This function plots the decision boundary of the trained model.
-"""
 def plot_decision_boundary(X, y, weights):
-    plt.figure(figsize=(10, 6))
-    plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='blue', label='Class 1')
-    plt.scatter(X[y == -1][:, 0], X[y == -1][:, 1], color='red', label='Class -1')
+  """
+      This function plots the decision boundary of the trained model.
+  """
 
-    #Create a grid to plot the decision boundary
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
-    
-    #Calculate the decision boundary
-    Z = np.dot(np.c_[xx.ravel(), yy.ravel()], weights)
-    Z = Z.reshape(xx.shape)
-    
-    plt.contourf(xx, yy, Z, levels=[-1e10, 0], colors='lightgray', alpha=0.5)
-    plt.title('Decision Boundary')
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.legend()
-    plt.show()
+  plt.figure(figsize=(10, 6))
+  plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='blue', label='Class 1')
+  plt.scatter(X[y == 0][:, 0], X[y == 0][:, 1], color='red', label='Class 0')
+  x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+  y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+  xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
+  Z = np.dot(np.c_[np.ones_like(xx.ravel()), xx.ravel(), yy.ravel()], weights)
+  Z = np.where(Z >= 0, 1, 0).reshape(xx.shape)
+  plt.contourf(xx, yy, Z, levels=[-0.5, 0.5, 1.5], colors=['lightcoral', 'lightblue'], alpha=0.5)
+  plt.title('Decision Boundary')
+  plt.xlabel('Feature 1')
+  plt.ylabel('Feature 2')
+  plt.legend()
+  plt.show()
+
+#################################################################
+def plot_accuracy(epochs, accuracy):
+  """
+  This function plots the accuracy of the model over epochs.
+  Args:
+      epochs (list): List of epoch numbers.
+      accuracy (list): List of accuracy values corresponding to each epoch.
+  """
+  plt.figure(figsize=(10, 6))
+  plt.plot(epochs, accuracy, marker='o', linestyle='-', color='blue')
+  plt.title('Model Accuracy Over Epochs')
+  plt.xlabel('Epochs')
+  plt.ylabel('Accuracy')
+  plt.grid()
+  plt.show()
+
+#################################################################

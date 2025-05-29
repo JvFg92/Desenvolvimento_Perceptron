@@ -1,6 +1,5 @@
 import ctypes
 import data_treatment as dt
-from sklearn.metrics import accuracy_score
 import numpy as np
 
 #Using ctypes to load the shared library
@@ -38,6 +37,9 @@ class Perceptron:
         self.cumulative_error = 0.0
         self.samples = 0 # Will store number of training samples
         self.features = 0 # Will store number of features (excluding bias)
+        self.acr = 0.0
+        self.train_accuracies = [] 
+        self.train_epochs = []
         self.load_data()
 
 #################################################################    
@@ -60,7 +62,7 @@ class Perceptron:
         acr = 0.0
         self.cumulative_error = 0.0
 
-        while self.accuracy > acr:
+        while self.accuracy > self.acr:
             self.epochs += 1
             current_epoch_error_sum = 0.0 
             for xi, target in zip(X_train_bias, self.y_train):
@@ -74,16 +76,14 @@ class Perceptron:
                 self.cumulative_error += error
                 current_epoch_error_sum += error
 
-            if self.epochs % 10 == 0: 
-                acr = self.evaluate()
-                print(f"Epoch: {self.epochs}, Cumulative Error during training: {self.cumulative_error}, Accuracy on Test: {acr}\n")
+            if self.epochs % 10 == 0: self.acr = self.evaluate()
+            
             if self.epochs >= 10000: #Max epochs to prevent infinite loop
                 print("Stopping training after 10000 epochs to prevent infinite loop.")
                 break
 
         print(f"Training finished after {self.epochs} epochs.")
-        return self.weights, self.cumulative_error
-        
+        return self.weights, self.cumulative_error, self.acr        
     
 #################################################################    
     
@@ -101,8 +101,6 @@ class Perceptron:
         
         bias_test = np.ones((num_test_samples, 1), dtype=np.double)
         X_test_bias = np.hstack((bias_test, self.X_test))
-
-        # self.weights and self.y_test should already be np.double from initialization/load_data
         
         acr = lib.evaluate_accuracy(
             X_test_bias.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),  # X_test with bias
@@ -159,3 +157,27 @@ class Perceptron:
             weights (numpy.ndarray): The learned weights.
         """
         return self.weights
+    
+#################################################################
+    
+    def plot_data(self):
+        """
+        Plots the training and testing data.
+        """
+        dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test)
+
+#################################################################
+    
+    def plot_decision_boundary(self):
+        """
+        Plots the decision boundary of the trained model.
+        """
+        dt.plot_decision_boundary(self.X_train, self.y_train, self.weights)
+
+#################################################################
+    
+    def plot_accuracy(self):
+        """
+        Plots the accuracy of the model over epochs.
+        """
+        dt.plot_accuracy(self.epochs, self.acr)
