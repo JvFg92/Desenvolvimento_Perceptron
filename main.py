@@ -21,5 +21,4 @@ if __name__ == "__main__":
     perceptron.plot_accuracy()
     perceptron.plot_weights()
     
-    
     perceptron.__del__()
