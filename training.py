@@ -19,14 +19,14 @@ lib.evaluate_accuracy.restype = ctypes.c_double
 #################################################################
 
 class Perceptron:
-    def __init__(self,lr=0.1, accuracy=0.9):
+    def __init__(self,lr=0.1, accuracy=0.9, generated = False, linear=False):
         """
         Initializes the Perceptron model with a learning rate and accuracy threshold.
         Args:
             lr (float): Learning rate for weight updates.
             accuracy (float): Desired accuracy threshold for training.
         """
-        self.accuracy = accuracy
+        self.ref_accuracy = accuracy
         self.lr = lr
         self.weights = None
         self.epochs = 0
@@ -35,14 +35,24 @@ class Perceptron:
         self.X_test = None
         self.y_test = None
         self.cumulative_error = 0.0
-        self.samples = 0 # Will store number of training samples
-        self.features = 0 # Will store number of features (excluding bias)
-        self.acr = 0.0
+        self.samples = 0
+        self.features = 0 #number of features (excluding bias)
+        self.test_accuracy = 0.0
         self.train_accuracies = [] 
         self.train_epochs = []
-        self.load_data()
+        self.weights_history = []
+        self.train_errors = []
+        self.load_data(gnt=generated, lnr=linear)
 
-#################################################################    
+#################################################################
+
+    def __del__(self):
+        """
+        Destructor to clean up resources.
+        """
+        print("Perceptron resources cleaned up.")
+
+#################################################################
 
     def learning(self):
         """
@@ -53,16 +63,21 @@ class Perceptron:
             weights (numpy.ndarray): The learned weights of the perceptron.
             error (float): The final error after training.
         """        
+        print("Starting training...\n")
         dimensionality_with_bias = self.features + 1 
         self.weights = np.zeros(dimensionality_with_bias, dtype=np.double)
 
         bias_train = np.ones((self.samples, 1), dtype=np.double)
         X_train_bias = np.hstack((bias_train, self.X_train))
 
-        acr = 0.0
+        self.test_accuracy = 0.0
         self.cumulative_error = 0.0
+        self.train_epochs = []
+        self.train_accuracies = []
+        self.weights_history = []
+        self.train_errors = []
 
-        while self.accuracy > self.acr:
+        while self.ref_accuracy > self.test_accuracy and self.epochs < 1000:
             self.epochs += 1
             current_epoch_error_sum = 0.0 
             for xi, target in zip(X_train_bias, self.y_train):
@@ -76,63 +91,96 @@ class Perceptron:
                 self.cumulative_error += error
                 current_epoch_error_sum += error
 
-            if self.epochs % 10 == 0: self.acr = self.evaluate()
+            if self.epochs % 10 == 0 : self.test_accuracy = self.evaluate(self.X_train, self.y_train)
+            #self.test_accuracy = self.evaluate(self.X_train, self.y_train) #May converge too fast in some cases.
+            self.train_accuracies.append(self.evaluate(self.X_train, self.y_train))
+            self.train_epochs.append(self.epochs)
+            self.weights_history.append(self.weights.copy())
+            self.train_errors.append(error)
+            self.cumulative_error = current_epoch_error_sum / self.samples
+            print(f"Epoch {self.epochs}: Cumulative Error Normalized = {self.cumulative_error:.4f}, Training Accuracy = {self.train_accuracies[-1]}")
             
-            if self.epochs >= 10000: #Max epochs to prevent infinite loop
-                print("Stopping training after 10000 epochs to prevent infinite loop.")
-                break
+        self.test_accuracy = self.evaluate(self.X_test, self.y_test)
+        print(f"\nFinal Training Accuracy (Tested) after {self.epochs} epochs: {self.test_accuracy}")
+        
+#################################################################
 
-        print(f"Training finished after {self.epochs} epochs.")
-        return self.weights, self.cumulative_error, self.acr        
-    
-#################################################################    
-    
-    def evaluate(self):
+    def evaluate(self,X,y):
         """
         Evaluates the perceptron model on the test data.
         Returns:
             accuracy (float): The accuracy of the model on the test set.
         """
-        if self.X_test is None or self.y_test is None or self.weights is None:
+        if X is None or y is None or self.weights is None:
             print("Error: Test data or weights not loaded/initialized.")
             return 0.0
 
-        num_test_samples = self.X_test.shape[0]
+        num_test_samples = X.shape[0]
         
         bias_test = np.ones((num_test_samples, 1), dtype=np.double)
-        X_test_bias = np.hstack((bias_test, self.X_test))
-        
+        X_test_bias = np.hstack((bias_test, X))
+
         acr = lib.evaluate_accuracy(
             X_test_bias.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),  # X_test with bias
             self.weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), # Weights
-            self.y_test.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),   # y_test
-            num_test_samples,                                              # Correct number of test samples
-            self.features + 1           # Number of features including bias (dimensionality of weights and X_test_bias columns)
+            y.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),   # y_test
+            num_test_samples,                                              
+            self.features + 1           # Number of features including bias
         )
 
         return acr
 
 #################################################################
 
-    def load_data(self, X_train=None, y_train=None, X_test=None, y_test=None):
+    def think(self, X=None):
+        """
+        Makes predictions using the trained perceptron model.
+        Args:
+            X (numpy.ndarray): Input data for prediction.
+        Returns:
+            numpy.ndarray: Predicted labels (0 or 1).
+        """
+        if self.weights is None:
+            print("Error: Weights not initialized. Please train the model first.")
+            return None
+        if X is None: X = self.X_test
+        num_samples = X.shape[0]
+        bias = np.ones((num_samples, 1), dtype=np.double)
+        X_bias = np.hstack((bias, X))
+
+        predictions = np.zeros(num_samples, dtype=np.double)
+        
+        for i in range(num_samples):
+            predictions[i] = lib.neuron(
+                X_bias[i].ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
+                self.weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
+                self.features + 1
+            )
+        
+        return predictions
+
+#################################################################
+
+    def load_data(self, X_train=None, y_train=None, X_test=None, y_test=None , gnt=False, lnr=False):
         """
         Loads the training and testing data.
         """
         if X_train is None or y_train is None:
-            self.X_train, self.y_train = dt.import_data(False)
+            if gnt: self.X_train, self.y_train = dt.generate_diagnostics(False, lnr)
+            else: self.X_train, self.y_train = dt.import_data(False,lnr)
         else:
             self.X_train = X_train.astype(np.double) 
             self.y_train = y_train.astype(np.double) 
 
         if X_test is None or y_test is None:
-            self.X_test, self.y_test = dt.import_data(True)
+            if gnt: self.X_test, self.y_test = dt.generate_diagnostics(True, lnr)
+            else: self.X_test, self.y_test = dt.import_data(True,lnr)
         else:
             self.X_test = X_test.astype(np.double) 
             self.y_test = y_test.astype(np.double) 
 
         if self.X_train is not None:
-            self.samples, self.features = self.X_train.shape 
-                                                        
+            self.samples, self.features = self.X_train.shape
         else:
             print("Warning: self.X_train is None, cannot determine shape.")
             self.samples = 0
@@ -140,23 +188,114 @@ class Perceptron:
 
 #################################################################
 
-    def get_epochs(self):
+    def cross_validate(self, k=5):
         """
-        Returns the number of epochs the model has been trained for.
+        Performs k-fold cross-validation on the training data.
+        Args:
+            k (int): Number of folds for cross-validation.
         Returns:
-            epochs (int): The number of epochs.
+            list: List of accuracies for each fold.
         """
-        return self.epochs
-    
+        if self.X_train is None or self.y_train is None:
+            print("Error: Original training data not loaded into the Perceptron instance.")
+            return []
+
+        #Preserve original state of the Perceptron instance
+        original_X_train = self.X_train.copy()
+        original_y_train = self.y_train.copy()
+        original_X_test = self.X_test.copy() if self.X_test is not None else None
+        original_y_test = self.y_test.copy() if self.y_test is not None else None
+
+        #Preserve original training history and parameters
+        original_weights = self.weights.copy() if self.weights is not None else None
+        original_epochs_count = self.epochs 
+        original_cumulative_error = self.cumulative_error
+        original_test_accuracy = self.test_accuracy
+        
+        original_train_accuracies_history = list(self.train_accuracies)
+        original_train_epochs_history = list(self.train_epochs)
+        original_weights_history_log = list(self.weights_history)
+        original_train_errors_history = list(self.train_errors)
+        
+        #Preserve original data dimensions
+        original_samples = self.samples
+        original_features = self.features
+
+        X_internal_cv = original_X_train 
+        y_internal_cv = original_y_train
+        
+        fold_accuracies = []
+        num_total_samples_cv = X_internal_cv.shape[0]
+        fold_size = num_total_samples_cv // k
+        
+        print(f"\nStarting {k}-Fold Cross-Validation...")
+
+        for i in range(k):
+            print(f"\n--- Cross-Validation Fold {i+1}/{k} ---")
+            start = i * fold_size
+            end = (start + fold_size) if i < k - 1 else num_total_samples_cv
+
+            X_val_fold = X_internal_cv[start:end]
+            y_val_fold = y_internal_cv[start:end]
+
+            X_train_fold = np.concatenate((X_internal_cv[:start], X_internal_cv[end:]), axis=0)
+            y_train_fold = np.concatenate((y_internal_cv[:start], y_internal_cv[end:]), axis=0)
+
+            #Load data for the current fold:
+            self.load_data(X_train=X_train_fold, y_train=y_train_fold, X_test=X_val_fold, y_test=y_val_fold)
+            
+            # Reset parameters and history for a clean training run for this fold
+            self.epochs = 0 
+            self.cumulative_error = 0.0
+            self.test_accuracy = 0.0 
+            self.train_accuracies = []
+            self.train_epochs = []
+            self.weights_history = []
+            self.train_errors = []
+
+            self.learning() 
+            
+            fold_accuracy_value = self.test_accuracy 
+            fold_accuracies.append(fold_accuracy_value)
+
+
+        #Restore original state of the Perceptron instance
+        self.X_train = original_X_train
+        self.y_train = original_y_train
+        self.X_test = original_X_test
+        self.y_test = original_y_test
+        self.samples = original_samples
+        self.features = original_features
+        
+        self.weights = original_weights
+        self.epochs = original_epochs_count
+        self.cumulative_error = original_cumulative_error
+        self.test_accuracy = original_test_accuracy 
+        
+        self.train_accuracies = original_train_accuracies_history
+        self.train_epochs = original_train_epochs_history
+        self.weights_history = original_weights_history_log
+        self.train_errors = original_train_errors_history
+        
+        print("\n--- Cross-Validation Summary ---")
+        if fold_accuracies:
+            print(f"Fold accuracies: {[f'{acc*100:.2f}%' for acc in fold_accuracies]}")
+            print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
+        else:
+            print("No accuracies recorded during cross-validation.")
+
+        self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy")
+
+        print("\nPerceptron state restored to pre-cross-validation.")
+        return fold_accuracies
+
 #################################################################
 
-    def get_weights(self):
+    def get_post_train(self):
         """
-        Returns the learned weights of the perceptron.
-        Returns:
-            weights (numpy.ndarray): The learned weights.
+        Returns the final training results after training.
         """
-        return self.weights
+        return self.weights, self.cumulative_error, self.test_accuracy, self.epochs
     
 #################################################################
     
@@ -176,8 +315,28 @@ class Perceptron:
 
 #################################################################
     
-    def plot_accuracy(self):
+    def plot_accuracy(self, acr = None, epc=None, ttl="Model Accuracy Over Epochs"):
         """
         Plots the accuracy of the model over epochs.
         """
-        dt.plot_accuracy(self.epochs, self.acr)
+        if acr is None: acr = self.train_accuracies
+        if epc is None: epc = self.train_epochs
+        dt.plot_accuracy(accuracy_history=acr, epochs=epc, title=ttl)
+
+#################################################################
+
+    def plot_weights(self):
+        """
+        Plots the evolution of weights during training.
+        """
+        dt.plot_weights(self.weights_history, self.train_epochs, self.features)
+
+#################################################################
+
+    def plot_errors(self):
+        """
+        Plots the training errors over epochs.
+        """
+        dt.plot_errors(self.train_errors, self.train_epochs)
+
+##################################################################

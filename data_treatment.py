@@ -1,10 +1,10 @@
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import make_classification
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-def import_data(test=False):
+def import_data(test=False, linear=False):
   """
     This function loads the iris dataset, converts it to a binary classification problem,
     and splits it into training and testing sets.
@@ -18,28 +18,68 @@ def import_data(test=False):
   iris = load_iris()
   X = iris.data
   y = iris.target
-  #print("Original y:", y)
-  #print("Original X:", X)
 
-  y = np.where(y == 0.0, 1.0, 0.0)  
+  if linear:
+    
+    y_processed = np.where(y == 0.0, 1.0, 0.0)  
+    #Convert to binary classification problem
+    X_processed = X[:, :2] #Using only the first two features as before
+    
+  else:
+    mask = (y == 1) | (y == 2)
+    X_subset = X[mask]
+    y_subset = y[mask]
 
-  #Convert to binary classification problem
-  X = X[:, :2] # Using only the first two features as before
-  X = (X - X.mean(axis=0)) / X.std(axis=0) # Scaling features as before
+    #Relabel: class 1 (Versicolour) -> 0.0, class 2 (Virginica) -> 1.0
+    y_processed = np.where(y_subset == 1, 0.0, 1.0)
+    
+    #Feature selection: Use first two features from the subset
+    X_processed = X_subset[:, :2]
 
   #Split the dataset into training and testing sets
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+  X_scaled = (X_processed - X_processed.mean(axis=0)) / X_processed.std(axis=0) # Scaling features
+  X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_processed, test_size=0.2, random_state=42)
   X_train_c = X_train.astype(np.double)
   y_train_c = y_train.astype(np.double) # y_train will now contain 0.0 and 1.0
   X_test_c = X_test.astype(np.double)
   y_test_c = y_test.astype(np.double)   # y_test will now contain 0.0 and 1.0
 
+  if test: return X_test_c, y_test_c
+  return X_train_c, y_train_c
+  
+#################################################################
+def generate_diagnostics(test=False, lnr=True, n_patients=300, separation=1.5, seed=42):
   """
-  print("X_train", X_train)
-  print("y_train", y_train)
-  print("X_test", X_test)
-  print("y_test", y_test)
+  This function generates synthetic diagnostic data for a binary classification problem.
+  It creates a dataset for tumor classification benign as 0.0 or 1.0 as malignant.
+  Args:
+      test (bool): If True, returns the test set only.
+      n_patients (int): Number of patients to generate.
+      separation (float): Controls the separation between classes.
+      seed (int or None): Random seed for reproducibility.
+  Returns:
+      X_train_c: Training features as a double array.
+      y_train_c: Training labels as a double array.
+      X_test_c: Testing features as a double array (if test=True).
+      y_test_c: Testing labels as a double array (if test=True).
   """
+  noise = 0.0
+  if lnr is False: noise = 0.5
+  X_exams, y_diagnosis = make_classification(
+      n_samples=n_patients,
+      n_features=2,
+      n_informative=2,
+      n_redundant=0,
+      n_clusters_per_class=1,
+      flip_y=noise,
+      class_sep=separation,
+      random_state=seed
+  )
+  X_train, X_test, y_train, y_test = train_test_split(X_exams, y_diagnosis, test_size=0.2, random_state=42)
+  X_train_c = X_train.astype(np.double)
+  y_train_c = y_train.astype(np.double) # y_train will now contain 0.0 and 1.0
+  X_test_c = X_test.astype(np.double)
+  y_test_c = y_test.astype(np.double)   # y_test will now contain 0.0 and 1.0
 
   if test: return X_test_c, y_test_c
   return X_train_c, y_train_c
@@ -49,7 +89,6 @@ def plot_data(X_train, y_train, X_test, y_test):
   """
   This function plots the training and testing data.
   """
-
   plt.figure(figsize=(10, 6))
   plt.scatter(X_train[y_train == 1][:, 0], X_train[y_train == 1][:, 1], color='blue', label='Class 1 (Train)')
   plt.scatter(X_train[y_train == 0][:, 0], X_train[y_train == 0][:, 1], color='red', label='Class 0 (Train)')
@@ -66,7 +105,6 @@ def plot_decision_boundary(X, y, weights):
   """
       This function plots the decision boundary of the trained model.
   """
-
   plt.figure(figsize=(10, 6))
   plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='blue', label='Class 1')
   plt.scatter(X[y == 0][:, 0], X[y == 0][:, 1], color='red', label='Class 0')
@@ -83,18 +121,44 @@ def plot_decision_boundary(X, y, weights):
   plt.show()
 
 #################################################################
-def plot_accuracy(epochs, accuracy):
+def plot_accuracy(accuracy_history, epochs, title="Model Accuracy Over Epochs"):
   """
-  This function plots the accuracy of the model over epochs.
-  Args:
-      epochs (list): List of epoch numbers.
-      accuracy (list): List of accuracy values corresponding to each epoch.
+      This function plots the accuracy of the model over epochs.
   """
   plt.figure(figsize=(10, 6))
-  plt.plot(epochs, accuracy, marker='o', linestyle='-', color='blue')
-  plt.title('Model Accuracy Over Epochs')
+  plt.plot(epochs, accuracy_history, marker='o')
+  plt.title(title)
   plt.xlabel('Epochs')
   plt.ylabel('Accuracy')
+  plt.grid()
+  plt.show()
+
+#################################################################
+def plot_weights(weights_history, epochs, features):
+  """
+      This function plots the evolution of weights during training.
+  """ 
+  plt.figure(figsize=(10, 6))
+  for i in range(features + 1):  # +1 for the bias term
+    plt.plot(epochs, [w[i] for w in weights_history], label=f'Weight {i}')
+  
+  plt.title('Weights Evolution Over Epochs')
+  plt.xlabel('Epochs')
+  plt.ylabel('Weights')
+  plt.legend()
+  plt.grid()
+  plt.show()
+
+#################################################################
+def plot_errors(error_history, epochs):
+  """
+      This function plots the error of the model over epochs.
+  """
+  plt.figure(figsize=(10, 6))
+  plt.plot(epochs, error_history, marker='o')
+  plt.title('Model Error Over Epochs')
+  plt.xlabel('Epochs')
+  plt.ylabel('Error')
   plt.grid()
   plt.show()
 
