@@ -2,7 +2,7 @@ import training as tr
 
 if __name__ == "__main__":
     
-    perceptron = tr.Perceptron(generated=True, linear=False)
+    perceptron = tr.Perceptron(generated=True, linear=True)
     perceptron.learning()
     weights, error, accuracy, epochs = perceptron.get_post_train()
     predict = perceptron.think()
