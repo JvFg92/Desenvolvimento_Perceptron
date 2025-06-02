@@ -16,6 +16,10 @@ lib.fit.restype = ctypes.c_double
 lib.evaluate_accuracy.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_int]
 lib.evaluate_accuracy.restype = ctypes.c_double
 
+#Predict Function
+lib.predict.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_int]
+lib.predict.restype = ctypes.POINTER(ctypes.c_int)
+
 #################################################################
 
 class Perceptron:
@@ -26,6 +30,8 @@ class Perceptron:
             lr (float): Learning rate for weight updates.
             accuracy (float): Desired accuracy threshold for training.
         """
+        self.generated = generated
+        self.linear = linear
         self.ref_accuracy = accuracy
         self.lr = lr
         self.weights = None
@@ -134,30 +140,30 @@ class Perceptron:
 
     def think(self, X=None):
         """
-        Makes predictions using the trained perceptron model.
+        Predicts the class labels for the input data using the trained model.
         Args:
-            X (numpy.ndarray): Input data for prediction.
+            X (numpy.ndarray): Input data for prediction. If None, uses self.X_test.
         Returns:
-            numpy.ndarray: Predicted labels (0 or 1).
+            numpy.ndarray: Predicted class labels.
         """
-        if self.weights is None:
-            print("Error: Weights not initialized. Please train the model first.")
-            return None
-        if X is None: X = self.X_test
+        if X is None:
+            if self.X_test is None:
+                print("Error: No test data available for prediction.")
+                return None
+            X = self.X_test
+
         num_samples = X.shape[0]
         bias = np.ones((num_samples, 1), dtype=np.double)
         X_bias = np.hstack((bias, X))
 
-        predictions = np.zeros(num_samples, dtype=np.double)
-        
-        for i in range(num_samples):
-            predictions[i] = lib.neuron(
-                X_bias[i].ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
-                self.weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
-                self.features + 1
-            )
-        
-        return predictions
+        predictions = lib.predict(
+            X_bias.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
+            self.weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)), 
+            num_samples, 
+            self.features + 1
+        )
+        results = np.ctypeslib.as_array(predictions, shape=(num_samples,))
+        return results
 
 #################################################################
 
@@ -188,7 +194,7 @@ class Perceptron:
 
 #################################################################
 
-    def cross_validate(self, k=5):
+    def cross_validate(self, k=5, plot=False):
         """
         Performs k-fold cross-validation on the training data.
         Args:
@@ -200,13 +206,12 @@ class Perceptron:
             print("Error: Original training data not loaded into the Perceptron instance.")
             return []
 
-        #Preserve original state of the Perceptron instance
+        #Preserve original Instance
         original_X_train = self.X_train.copy()
         original_y_train = self.y_train.copy()
         original_X_test = self.X_test.copy() if self.X_test is not None else None
         original_y_test = self.y_test.copy() if self.y_test is not None else None
 
-        #Preserve original training history and parameters
         original_weights = self.weights.copy() if self.weights is not None else None
         original_epochs_count = self.epochs 
         original_cumulative_error = self.cumulative_error
@@ -217,7 +222,6 @@ class Perceptron:
         original_weights_history_log = list(self.weights_history)
         original_train_errors_history = list(self.train_errors)
         
-        #Preserve original data dimensions
         original_samples = self.samples
         original_features = self.features
 
@@ -244,7 +248,7 @@ class Perceptron:
             #Load data for the current fold:
             self.load_data(X_train=X_train_fold, y_train=y_train_fold, X_test=X_val_fold, y_test=y_val_fold)
             
-            # Reset parameters and history for a clean training run for this fold
+            #Reset parameters and history for a clean training run for this fold
             self.epochs = 0 
             self.cumulative_error = 0.0
             self.test_accuracy = 0.0 
@@ -283,45 +287,60 @@ class Perceptron:
             print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
         else:
             print("No accuracies recorded during cross-validation.")
-
-        self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy")
+        
+        if plot:
+            self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy", xlabel="Fold Number")
 
         print("\nPerceptron state restored to pre-cross-validation.")
         return fold_accuracies
 
 #################################################################
 
-    def get_post_train(self):
+    def get_post_train(self, plot=False):
         """
         Returns the final training results after training.
         """
+        if plot:
+            self.plot_errors()
+            self.plot_weights()
+            self.plot_accuracy(acr=self.train_accuracies, epc=self.train_epochs, ttl="Training Accuracy Over Epochs")
+            self.plot_decision_boundary()
         return self.weights, self.cumulative_error, self.test_accuracy, self.epochs
-    
+
 #################################################################
-    
+
     def plot_data(self):
         """
         Plots the training and testing data.
         """
-        dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test)
-
+        if self.generated and self.linear:
+            dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Tumor Classification Benign(0)/Malignant(1)]", xlabel="Morning Size", ylabel="Color Intensity")
+        elif self.generated and not self.linear:
+            dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Tumor Classification Benign(0)/Malignant(1)]", xlabel="Morning Size", ylabel="Color Intensity")
+        elif not self.generated and self.linear:
+            dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Iris Classification Setosa(1)/No Setosa(0)]", xlabel="Sepal Length", ylabel="Sepal Width")
+        else:
+            dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Iris Classification Versicolor(1)/Virginica(0)]", xlabel="Sepal Length", ylabel="Sepal Width")
 #################################################################
     
     def plot_decision_boundary(self):
         """
         Plots the decision boundary of the trained model.
         """
-        dt.plot_decision_boundary(self.X_train, self.y_train, self.weights)
+        if self.generated:
+            dt.plot_decision_boundary(self.X_train, self.y_train, self.weights, title="Decision Boundary (Tumor Classification)", xlabel="Morning Size", ylabel="Color Intensity")
+        else:
+            dt.plot_decision_boundary(self.X_train, self.y_train, self.weights, title="Decision Boundary (Iris Classification)", xlabel="Sepal Length", ylabel="Sepal Width")
 
 #################################################################
     
-    def plot_accuracy(self, acr = None, epc=None, ttl="Model Accuracy Over Epochs"):
+    def plot_accuracy(self, acr = None, epc=None, ttl="Model Accuracy Over Epochs", ylabel="Accuracy", xlabel="Epochs"):
         """
         Plots the accuracy of the model over epochs.
         """
         if acr is None: acr = self.train_accuracies
         if epc is None: epc = self.train_epochs
-        dt.plot_accuracy(accuracy_history=acr, epochs=epc, title=ttl)
+        dt.general_plot(data=acr, interval=epc, title=ttl, ylabel=ylabel, xlabel=xlabel)
 
 #################################################################
 
@@ -337,6 +356,6 @@ class Perceptron:
         """
         Plots the training errors over epochs.
         """
-        dt.plot_errors(self.train_errors, self.train_epochs)
+        dt.general_plot(self.train_errors, self.train_epochs, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
 
 ##################################################################

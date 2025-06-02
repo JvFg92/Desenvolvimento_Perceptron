@@ -48,7 +48,7 @@ def import_data(test=False, linear=False):
   return X_train_c, y_train_c
   
 #################################################################
-def generate_diagnostics(test=False, lnr=True, n_patients=300, separation=1.5, seed=42):
+def generate_diagnostics(test=False, lnr=True, n_patients=300, separation=3, seed=52):
   """
   This function generates synthetic diagnostic data for a binary classification problem.
   It creates a dataset for tumor classification benign as 0.0 or 1.0 as malignant.
@@ -85,7 +85,7 @@ def generate_diagnostics(test=False, lnr=True, n_patients=300, separation=1.5, s
   return X_train_c, y_train_c
 
 #################################################################
-def plot_data(X_train, y_train, X_test, y_test):
+def plot_data(X_train, y_train, X_test, y_test, title="Training and Testing Data", xlabel="Feature 1", ylabel="Feature 2"):
   """
   This function plots the training and testing data.
   """
@@ -94,14 +94,14 @@ def plot_data(X_train, y_train, X_test, y_test):
   plt.scatter(X_train[y_train == 0][:, 0], X_train[y_train == 0][:, 1], color='red', label='Class 0 (Train)')
   plt.scatter(X_test[y_test == 1][:, 0], X_test[y_test == 1][:, 1], color='cyan', label='Class 1 (Test)', marker='x')
   plt.scatter(X_test[y_test == 0][:, 0], X_test[y_test == 0][:, 1], color='orange', label='Class 0 (Test)', marker='x')
-  plt.title('Training and Testing Data')
-  plt.xlabel('Feature 1')
-  plt.ylabel('Feature 2')
+  plt.title(title)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
   plt.legend()
   plt.show()
 
 #################################################################
-def plot_decision_boundary(X, y, weights):
+def plot_decision_boundary(X, y, weights, title="Decision Boundary", xlabel="Feature 1", ylabel="Feature 2"):
   """
       This function plots the decision boundary of the trained model.
   """
@@ -114,22 +114,22 @@ def plot_decision_boundary(X, y, weights):
   Z = np.dot(np.c_[np.ones_like(xx.ravel()), xx.ravel(), yy.ravel()], weights)
   Z = np.where(Z >= 0, 1, 0).reshape(xx.shape)
   plt.contourf(xx, yy, Z, levels=[-0.5, 0.5, 1.5], colors=['lightcoral', 'lightblue'], alpha=0.5)
-  plt.title('Decision Boundary')
-  plt.xlabel('Feature 1')
-  plt.ylabel('Feature 2')
+  plt.title(title)
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
   plt.legend()
   plt.show()
 
 #################################################################
-def plot_accuracy(accuracy_history, epochs, title="Model Accuracy Over Epochs"):
+def general_plot(data, interval, title="Model Performance Over Epochs", ylabel="Performance", xlabel="Interval"):
   """
-      This function plots the accuracy of the model over epochs.
+      This function plots the performance of the model over epochs.
   """
   plt.figure(figsize=(10, 6))
-  plt.plot(epochs, accuracy_history, marker='o')
+  plt.plot(interval, data, marker='o')
   plt.title(title)
-  plt.xlabel('Epochs')
-  plt.ylabel('Accuracy')
+  plt.xlabel(xlabel)
+  plt.ylabel(ylabel)
   plt.grid()
   plt.show()
 
@@ -146,19 +146,6 @@ def plot_weights(weights_history, epochs, features):
   plt.xlabel('Epochs')
   plt.ylabel('Weights')
   plt.legend()
-  plt.grid()
-  plt.show()
-
-#################################################################
-def plot_errors(error_history, epochs):
-  """
-      This function plots the error of the model over epochs.
-  """
-  plt.figure(figsize=(10, 6))
-  plt.plot(epochs, error_history, marker='o')
-  plt.title('Model Error Over Epochs')
-  plt.xlabel('Epochs')
-  plt.ylabel('Error')
   plt.grid()
   plt.show()
 

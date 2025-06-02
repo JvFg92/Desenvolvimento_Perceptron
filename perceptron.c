@@ -68,14 +68,38 @@ double fit(double *x, double *w, double target, double learning_rate, int n) {
 
 double evaluate_accuracy(double *x, double *w, double *y, int samples, int features) {
   int correct_predictions = 0;
+  int *predictions = predict(x, w, samples, features);
   for (int i = 0; i < samples; i++) {
-      double *current_sample_x = &x[i * features];
-      double output = neuron(current_sample_x, w, features);
-      if (output == y[i]) {
-        correct_predictions++;
-      }
+    if (predictions[i] == y[i]) {
+      correct_predictions++;
     }
+  }
 
   double accuracy = (double)correct_predictions / samples;
+  free(predictions);
   return accuracy;
+}
+
+/*******************************************************************************/
+/**
+ * @brief Predicts the output for a set of input samples using the trained perceptron.
+ *
+ * @param x Pointer to the flattened input data.
+ * @param w Pointer to the weight vector.
+ * @param samples Number of samples in the dataset.
+ * @param features Number of features (including bias) for each sample.
+ * @return int* Pointer to an array containing the predicted outputs for each sample.
+ */
+
+int *predict(double *x, double *w, int samples, int features) {
+  int *predictions = (int *)malloc(samples * sizeof(int));
+  if (predictions == NULL) {
+    return NULL; 
+  }
+
+  for (int i = 0; i < samples; i++) {
+    double *current_sample_x = &x[i * features];
+    predictions[i] = (int)neuron(current_sample_x, w, features);
+  }
+  return predictions;
 }
