@@ -4,7 +4,7 @@ if __name__ == "__main__":
     """
     Main entry point for training and evaluating the Perceptron model.
     """
-    perceptron = tr.Perceptron(generated=True, linear=False)
+    perceptron = tr.Perceptron(generated=True, linear=True)
     perceptron.plot_data()
     perceptron.learning()
     weights, error, accuracy, epochs = perceptron.get_post_train(plot=True)

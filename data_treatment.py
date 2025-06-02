@@ -121,7 +121,7 @@ def plot_decision_boundary(X, y, weights, title="Decision Boundary", xlabel="Fea
   plt.show()
 
 #################################################################
-def general_plot(data, interval, title="Model Performance Over Epochs", ylabel="Performance", xlabel="Interval"):
+def general_plot(data, interval, title="Model Performance Over Intervals", ylabel="Performance", xlabel="Interval"):
   """
       This function plots the performance of the model over epochs.
   """
@@ -139,7 +139,7 @@ def plot_weights(weights_history, epochs, features):
       This function plots the evolution of weights during training.
   """ 
   plt.figure(figsize=(10, 6))
-  for i in range(features + 1):  # +1 for the bias term
+  for i in range(features + 1):  #+1 for the bias term
     plt.plot(epochs, [w[i] for w in weights_history], label=f'Weight {i}')
   
   plt.title('Weights Evolution Over Epochs')

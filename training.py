@@ -321,6 +321,7 @@ class Perceptron:
             dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Iris Classification Setosa(1)/No Setosa(0)]", xlabel="Sepal Length", ylabel="Sepal Width")
         else:
             dt.plot_data(self.X_train, self.y_train, self.X_test, self.y_test, title="Training and Testing Data [Iris Classification Versicolor(1)/Virginica(0)]", xlabel="Sepal Length", ylabel="Sepal Width")
+
 #################################################################
     
     def plot_decision_boundary(self):
