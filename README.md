@@ -1,19 +1,19 @@
-# 🧠 Perceptron Acelerado por C para Classificação Binária
+# 🧠 Perceptron Acelerado por C para Classificação Binária ⚙️
 
-Este projeto implementa um algoritmo Perceptron para classificação binária, com suas funções de cálculo principais escritas em C para otimização de desempenho e envolvidas em uma classe Python para fácil uso, manipulação de dados e visualização. O projeto inclui funcionalidades para usar o conjunto de dados Iris (convertido para um problema binário) ou gerar dados sintéticos para treinamento e teste.
+Este projeto implementa um algoritmo Perceptron para classificação binária, com suas funções de cálculo principais escritas em C para otimização de desempenho e envolvidas em uma classe Python para fácil uso, manipulação de dados e visualização. 📊 O projeto inclui funcionalidades para usar o conjunto de dados Iris (convertido para um problema binário) ou gerar dados sintéticos para treinamento e teste.
 
 🎯 **Objetivo:** Criar um classificador Perceptron eficiente com um backend em C e uma interface Python amigável.
 
 ✨ **Visualização de Exemplo:**
-
-![Exemplo de Limite de Decisão](https://github.com/user-attachments/assets/23f1dddd-ba94-48d6-bdd1-3421bb57614e)
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/23f1dddd-ba94-48d6-bdd1-3421bb57614e" alt="Exemplo de Limite de Decisão" width="600"/>
+  </p>
 
 ## 🌟 Visão Geral
 
 O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais simples para classificação binária. Este projeto demonstra:
 * Implementação do algoritmo Perceptron.
-* Uso de C para as operações computacionalmente intensivas (neurônio, ajuste, avaliação) via `ctypes` em Python.
+* Uso de C para as operações computacionalmente intensivas (cálculo do neurônio, ajuste de pesos, avaliação de precisão) via `ctypes` em Python.
 * Uma classe Python `Perceptron` que encapsula a lógica de treinamento, previsão, avaliação e plotagem.
 * Carregamento e pré-processamento de dados para o conjunto de dados Iris e geração de dados sintéticos. 🌸
 * Divisão de dados em conjuntos de treinamento e teste.
@@ -30,11 +30,11 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 
 ## ✨ Funcionalidades Principais
 
-* **Núcleo em C ⚙️:** Funções `neuron`, `fit`, e `evaluate_accuracy` implementadas em C para eficiência.
+* **Núcleo em C ⚙️:** Funções `neuron`, `fit`, `evaluate_accuracy` e `predict` implementadas em C para eficiência.
 * **Wrapper Python 🐍:** Classe `Perceptron` em Python fácil de usar.
 * **Fontes de Dados 💾:**
     * Utiliza o conjunto de dados Iris (filtrado para duas classes e duas características).
-    * Gera dados sintéticos para problemas de classificação linearmente separáveis e não linearmente separáveis.
+    * Gera dados sintéticos para problemas de classificação (linearmente separáveis ou com ruído).
 * **Pré-processamento 🧹:**
     * Converte problemas multiclasse para binários.
     * Dimensiona características usando a média e o desvio padrão.
@@ -50,7 +50,6 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
     * Curvas de aprendizado (precisão, erro, pesos).
 * **Flexibilidade 🛠️:** Permite a configuração da taxa de aprendizado, precisão de referência e parâmetros de geração de dados.
 
-
 ## 📂 Estrutura do Projeto
 
 ├── 📄 perceptron.c        # Implementação em C das funções principais do Perceptron
@@ -65,7 +64,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 
 └── 📖 main.py             # Script principal para executar o treinamento e avaliação
 
-## Pré-requisitos
+## 🛠️ Pré-requisitos
 
 * Python 3.12.3 🐍
 * Compilador C (como GCC) ⚙️
@@ -78,8 +77,8 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 
 1.  **Clone o repositório:**
     ```bash
-    git clone https://github.com/JvFg92/Perceptron_Data_Classify
-    cd Perceptron_Data_Classify
+    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git) # Substitua pela URL do seu repositório
+    cd seu-repositorio
     ```
 
 2.  **Compile o código C para criar a biblioteca compartilhada (`perceptron.so`):**
