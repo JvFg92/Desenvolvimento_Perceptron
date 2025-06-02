@@ -19,7 +19,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 * Divisão de dados em conjuntos de treinamento e teste.
 * Dimensionamento de características (normalização Z-score).
 * Treinamento com uma taxa de aprendizado definida e um limite de precisão.
-* Cálculo de erro e precisão. 📈
+* Cálculo de erro e acuracia. 📈
 * Validação cruzada K-fold.
 * Visualização de:
     * Dados de treinamento e teste 📍
@@ -78,7 +78,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 1.  **Clone o repositório:**
     ```bash
     git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git) # Substitua pela URL do seu repositório
-    cd seu-repositorio
+    cd "seu-repositorio"
     ```
 
 2.  **Compile o código C para criar a biblioteca compartilhada (`perceptron.so`):**
