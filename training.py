@@ -60,7 +60,7 @@ class Perceptron:
 
 #################################################################
 
-    def learning(self):
+    def learning(self, epcs=1000):
         """
         This function trains the perceptron model using the provided data.
         Args:
@@ -83,7 +83,7 @@ class Perceptron:
         self.weights_history = []
         self.train_errors = []
 
-        while self.ref_accuracy > self.test_accuracy and self.epochs < 1000:
+        while self.ref_accuracy > self.test_accuracy and self.epochs < epcs:
             self.epochs += 1
             current_epoch_error_sum = 0.0 
             for xi, target in zip(X_train_bias, self.y_train):
