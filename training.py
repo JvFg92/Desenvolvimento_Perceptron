@@ -1,6 +1,7 @@
 import ctypes
 import data_treatment as dt
 import numpy as np
+from sklearn.metrics import recall_score
 
 #Using ctypes to load the shared library
 lib = ctypes.CDLL("./perceptron.so")
@@ -44,6 +45,8 @@ class Perceptron:
         self.samples = 0
         self.features = 0 #number of features (excluding bias)
         self.test_accuracy = 0.0
+        self.recall_score = 0.0
+        self.recall_history = []
         self.train_accuracies = [] 
         self.train_epochs = []
         self.weights_history = []
@@ -78,6 +81,8 @@ class Perceptron:
 
         self.test_accuracy = 0.0
         self.cumulative_error = 0.0
+        self.recall_score = 0.0
+        self.recall_history = []
         self.train_epochs = []
         self.train_accuracies = []
         self.weights_history = []
@@ -97,17 +102,18 @@ class Perceptron:
                 self.cumulative_error += error
                 current_epoch_error_sum += error
 
-            if self.epochs % 10 == 0 : self.test_accuracy = self.evaluate(self.X_train, self.y_train)
+            if self.epochs % 10 == 0 : self.test_accuracy, self.recall_score = self.evaluate(self.X_train, self.y_train)
             #self.test_accuracy = self.evaluate(self.X_train, self.y_train) #May converge too fast in some cases.
             self.train_accuracies.append(self.evaluate(self.X_train, self.y_train))
+            self.recall_history.append(self.recall_score)
             self.train_epochs.append(self.epochs)
             self.weights_history.append(self.weights.copy())
             self.train_errors.append(error)
             self.cumulative_error = current_epoch_error_sum / self.samples
-            print(f"Epoch {self.epochs}: Cumulative Error Normalized = {self.cumulative_error:.4f}, Training Accuracy = {self.train_accuracies[-1]}")
+            print(f"Epoch {self.epochs}: Cumulative Error Normalized = {self.cumulative_error:.4f}, Training Accuracy = {self.train_accuracies[-1]}, Recall Score = {self.recall_score:.4f}")
             
-        self.test_accuracy = self.evaluate(self.X_test, self.y_test)
-        print(f"\nFinal Training Accuracy (Tested) after {self.epochs} epochs: {self.test_accuracy}")
+        self.test_accuracy, self.recall_score = self.evaluate(self.X_test, self.y_test)
+        print(f"\nFinal Training Accuracy (Tested) after {self.epochs} epochs: {self.test_accuracy}, Recall Score: {self.recall_score:.4f}")
         
 #################################################################
 
@@ -134,7 +140,9 @@ class Perceptron:
             self.features + 1           # Number of features including bias
         )
 
-        return acr
+        recall=recall_score(y, self.predict(X), zero_division=0)
+
+        return acr, recall
 
 #################################################################
 
@@ -304,8 +312,9 @@ class Perceptron:
             self.plot_errors()
             self.plot_weights()
             self.plot_accuracy(acr=self.train_accuracies, epc=self.train_epochs, ttl="Training Accuracy Over Epochs")
+            self.plot_recall()
             self.plot_decision_boundary()
-        return self.weights, self.cumulative_error, self.test_accuracy, self.epochs
+        return self.weights, self.cumulative_error, self.test_accuracy, self.epochs, self.recall_score
 
 #################################################################
 
@@ -358,5 +367,13 @@ class Perceptron:
         Plots the training errors over epochs.
         """
         dt.general_plot(self.train_errors, self.train_epochs, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
+
+##################################################################
+    
+    def plot_recall(self):
+        """
+        Plots the recall score over epochs.
+        """
+        dt.general_plot(self.recall_history, self.train_epochs, title="Recall Score Over Epochs", ylabel="Recall Score", xlabel="Epochs")
 
 ##################################################################
