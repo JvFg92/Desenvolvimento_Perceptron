@@ -104,14 +104,15 @@ class Perceptron:
 
             if self.epochs % 10 == 0 : self.test_accuracy, self.recall_score = self.evaluate(self.X_train, self.y_train)
             #self.test_accuracy = self.evaluate(self.X_train, self.y_train) #May converge too fast in some cases.
-            self.train_accuracies.append(self.evaluate(self.X_train, self.y_train))
-            self.recall_history.append(self.recall_score)
+            acr,rcl= self.evaluate(self.X_train, self.y_train)
+            self.train_accuracies.append(acr)
+            self.recall_history.append(rcl)
             self.train_epochs.append(self.epochs)
             self.weights_history.append(self.weights.copy())
             self.train_errors.append(error)
             self.cumulative_error = current_epoch_error_sum / self.samples
-            print(f"Epoch {self.epochs}: Cumulative Error Normalized = {self.cumulative_error:.4f}, Training Accuracy = {self.train_accuracies[-1]}, Recall Score = {self.recall_score:.4f}")
-            
+            print(f"Epoch {self.epochs}: Cumulative Error Normalized = {self.cumulative_error:.4f}, Training Accuracy = {self.train_accuracies[-1]}, Recall Score = {self.recall_history[-1]:.4f}")
+
         self.test_accuracy, self.recall_score = self.evaluate(self.X_test, self.y_test)
         print(f"\nFinal Training Accuracy (Tested) after {self.epochs} epochs: {self.test_accuracy}, Recall Score: {self.recall_score:.4f}")
         
@@ -139,8 +140,10 @@ class Perceptron:
             num_test_samples,                                              
             self.features + 1           # Number of features including bias
         )
-
-        recall=recall_score(y, self.predict(X), zero_division=0)
+        predictions = self.think(X_test_bias)
+        predictions = predictions.astype(np.double)
+        
+        recall=recall_score(y, predictions, zero_division=0)
 
         return acr, recall
 
@@ -209,6 +212,7 @@ class Perceptron:
             k (int): Number of folds for cross-validation.
         Returns:
             list: List of accuracies for each fold.
+            list: List of recall scores for each fold.
         """
         if self.X_train is None or self.y_train is None:
             print("Error: Original training data not loaded into the Perceptron instance.")
@@ -224,8 +228,10 @@ class Perceptron:
         original_epochs_count = self.epochs 
         original_cumulative_error = self.cumulative_error
         original_test_accuracy = self.test_accuracy
+        original_recall_score = self.recall_score
         
         original_train_accuracies_history = list(self.train_accuracies)
+        original_recall_history = list(self.recall_history)
         original_train_epochs_history = list(self.train_epochs)
         original_weights_history_log = list(self.weights_history)
         original_train_errors_history = list(self.train_errors)
@@ -237,6 +243,7 @@ class Perceptron:
         y_internal_cv = original_y_train
         
         fold_accuracies = []
+        fold_recall_history = []
         num_total_samples_cv = X_internal_cv.shape[0]
         fold_size = num_total_samples_cv // k
         
@@ -260,6 +267,8 @@ class Perceptron:
             self.epochs = 0 
             self.cumulative_error = 0.0
             self.test_accuracy = 0.0 
+            self.recall_score = 0.0
+            self.recall_history = []
             self.train_accuracies = []
             self.train_epochs = []
             self.weights_history = []
@@ -267,8 +276,9 @@ class Perceptron:
 
             self.learning() 
             
-            fold_accuracy_value = self.test_accuracy 
-            fold_accuracies.append(fold_accuracy_value)
+             
+            fold_accuracies.append(self.test_accuracy)
+            fold_recall_history.append(self.recall_score)
 
 
         #Restore original state of the Perceptron instance
@@ -285,22 +295,22 @@ class Perceptron:
         self.test_accuracy = original_test_accuracy 
         
         self.train_accuracies = original_train_accuracies_history
+        self.recall_history = original_recall_history
+        self.recall_score = original_recall_score
         self.train_epochs = original_train_epochs_history
         self.weights_history = original_weights_history_log
         self.train_errors = original_train_errors_history
         
         print("\n--- Cross-Validation Summary ---")
-        if fold_accuracies:
-            print(f"Fold accuracies: {[f'{acc*100:.2f}%' for acc in fold_accuracies]}")
-            print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
-        else:
-            print("No accuracies recorded during cross-validation.")
+        print(f"Fold accuracies: {[f'{acc*100:.2f}%' for acc in fold_accuracies]}")
+        print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
+        print(f"Fold recall scores: {[f'{rec:.4f}' for rec in fold_recall_history]}")
+        print(f"Mean CV recall: {np.mean(fold_recall_history):.4f}")
         
         if plot:
             self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy", xlabel="Fold Number")
-
+            self.plot_recall(rcl=fold_recall_history, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Recall", xlabel="Fold Number")
         print("\nPerceptron state restored to pre-cross-validation.")
-        return fold_accuracies
 
 #################################################################
 
@@ -312,7 +322,7 @@ class Perceptron:
             self.plot_errors()
             self.plot_weights()
             self.plot_accuracy(acr=self.train_accuracies, epc=self.train_epochs, ttl="Training Accuracy Over Epochs")
-            self.plot_recall()
+            self.plot_recall(rcl=self.recall_history, epc=self.train_epochs, ttl="Training Recall Over Epochs")
             self.plot_decision_boundary()
         return self.weights, self.cumulative_error, self.test_accuracy, self.epochs, self.recall_score
 
@@ -369,11 +379,13 @@ class Perceptron:
         dt.general_plot(self.train_errors, self.train_epochs, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
 
 ##################################################################
-    
-    def plot_recall(self):
+
+    def plot_recall(self, rcl = None, epc=None, ttl="Model Recall Over Epochs", ylabel="Recall", xlabel="Epochs"):
         """
-        Plots the recall score over epochs.
+        Plots the recall of the model over epochs.
         """
-        dt.general_plot(self.recall_history, self.train_epochs, title="Recall Score Over Epochs", ylabel="Recall Score", xlabel="Epochs")
+        if rcl is None: rcl = self.train_recall_history
+        if epc is None: epc = self.train_epochs
+        dt.general_plot(data=rcl, interval=epc, title=ttl, ylabel=ylabel, xlabel=xlabel)
 
 ##################################################################
