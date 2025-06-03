@@ -275,7 +275,6 @@ class Perceptron:
             self.train_errors = []
 
             self.learning() 
-            
              
             fold_accuracies.append(self.test_accuracy)
             fold_recall_history.append(self.recall_score)
@@ -305,7 +304,7 @@ class Perceptron:
         print(f"Fold accuracies: {[f'{acc*100:.2f}%' for acc in fold_accuracies]}")
         print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
         print(f"Fold recall scores: {[f'{rec:.4f}' for rec in fold_recall_history]}")
-        print(f"Mean CV recall: {np.mean(fold_recall_history):.4f}")
+        print(f"Mean CV recall: {np.mean(fold_recall_history)*100:.4f}")
         
         if plot:
             self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy", xlabel="Fold Number")
