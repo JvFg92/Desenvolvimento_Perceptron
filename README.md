@@ -19,7 +19,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 * Divisão de dados em conjuntos de treinamento e teste.
 * Dimensionamento de características (normalização Z-score).
 * Treinamento com uma taxa de aprendizado definida e um limite de precisão.
-* Cálculo de erro e acuracia. 📈
+* Cálculo de erro, acuracia e revocação. 📈
 * Validação cruzada K-fold.
 * Visualização de:
     * Dados de treinamento e teste 📍
