@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print("Final Error:", error)
     print("Number of epochs:", epochs)
     print(f"Final Accuracy: {accuracy*100:.2f}%")
-    print(f"Final Recall: {recall*100:.4f}")
+    print(f"Final Recall: {recall*100:.2f}%")
     print("\nPredictions Test:", predict)
 
     perceptron.__del__()
