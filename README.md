@@ -78,7 +78,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 1.  **Clone o repositório:**
     ```bash
     git clone https://github.com/JvFg92/Perceptron_Data_Classify
-    cd "seu-repositorio"
+    cd Perceptron_Data_Classify
     ```
 
 2.  **Compile o código C para criar a biblioteca compartilhada (`perceptron.so`):**
@@ -93,14 +93,32 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
     ℹ️ Certifique-se de que o arquivo `perceptron.so` (ou `perceptron.dll` no Windows) resultante esteja no mesmo diretório que os scripts Python.
 
 3.  **Instale as dependências Python:**
-    ```bash
+     ```bash
     pip install numpy matplotlib scikit-learn
     ```
+    
+    ⚠️ Para Linux pode ser necessário:
+    ```bash
+    sudo apt install python3-numpy
+    sudo apt install python3-matplotlib
+    sudo apt install python3-sklearn
+    ```
+    
+    ⚠️ Para Windows pode ser necessário:
+    ```bash
+    py -m pip install numpy matplotlib scikit-learn
+    ```
+    
     ✅ Pronto para começar!
 
 ## ▶️ Uso
 
 O script principal para executar o modelo é `main.py`.
-
+No linux:
 ```bash
 python3 main.py
+```
+No Windows:
+```bash
+py main.py
+```
