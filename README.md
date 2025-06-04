@@ -114,11 +114,15 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 ## ▶️ Uso
 
 O script principal para executar o modelo é `main.py`.
-No linux:
+```bash
+python main.py
+```
+
+⚠️ Para Linux pode ser necessário:
 ```bash
 python3 main.py
 ```
-No Windows:
+⚠️ Para Windows pode ser necessário:
 ```bash
 py main.py
 ```
