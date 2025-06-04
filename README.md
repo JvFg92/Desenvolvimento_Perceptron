@@ -1,128 +1,127 @@
-# 🧠 Perceptron Acelerado por C para Classificação Binária ⚙️
+# 🧠 C-Accelerated Perceptron for Binary Classification ⚙️
 
-Este projeto implementa um algoritmo Perceptron para classificação binária, com suas funções de cálculo principais escritas em C para otimização de desempenho e envolvidas em uma classe Python para fácil uso, manipulação de dados e visualização. 📊 O projeto inclui funcionalidades para usar o conjunto de dados Iris (convertido para um problema binário) ou gerar dados sintéticos para treinamento e teste.
+This project implements a Perceptron algorithm for binary classification, with its main design functions written in C for performance optimization and wrapped in a Python class for easy use, data manipulation, and visualization. 📊 The project includes functionality to use the Iris dataset (converted to a binary problem) or generate synthetic data for training and testing.
 
-🎯 **Objetivo:** Criar um classificador Perceptron eficiente com um backend em C e uma interface Python amigável.
+🎯 **Goal:** Create an efficient Perceptron classifier with a C backend and a friendly Python interface.
 
-✨ **Visualização de Exemplo:**
+✨ **Example View:**
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/23f1dddd-ba94-48d6-bdd1-3421bb57614e" alt="Exemplo de Limite de Decisão" width="600"/>
-  </p>
+<img src="https://github.com/user-attachments/assets/23f1dddd-ba94-48d6-bdd1-3421bb57614e" alt="Decision Boundary Example" width="600"/>
+</p>
 
-## 🌟 Visão Geral
+## 🌟 Overview
 
-O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais simples para classificação binária. Este projeto demonstra:
-* Implementação do algoritmo Perceptron.
-* Uso de C para as operações computacionalmente intensivas (cálculo do neurônio, ajuste de pesos, avaliação de precisão) via `ctypes` em Python.
-* Uma classe Python `Perceptron` que encapsula a lógica de treinamento, previsão, avaliação e plotagem.
-* Carregamento e pré-processamento de dados para o conjunto de dados Iris e geração de dados sintéticos. 🌸
-* Divisão de dados em conjuntos de treinamento e teste.
-* Dimensionamento de características (normalização Z-score).
-* Treinamento com uma taxa de aprendizado definida e um limite de precisão.
-* Cálculo de erro, acuracia e revocação. 📈
-* Validação cruzada K-fold.
-* Visualização de:
-    * Dados de treinamento e teste 📍
-    * Limite de decisão do modelo treinado 🗺️
-    * Precisão do modelo ao longo das épocas 🎯
-    * Evolução dos pesos durante o treinamento 🏋️
-    * Erro do modelo ao longo das épocas 📉
+Perceptron is one of the simplest supervised machine learning algorithms for binary classification. This project demonstrates:
+* Implementation of the Perceptron algorithm.
+* Usage of C for computationally intensive operations (neuron calculation, weight adjustment, accuracy evaluation) via `ctypes` in Python.
+* A Python `Perceptron` class that encapsulates the training, prediction, evaluation, and plotting logic.
+* Loading and preprocessing data for the Iris dataset and generating synthetic data. 🌸
+* Splitting data into training and testing sets.
+* Feature scaling (Z-score normalization).
+* Training with a defined learning rate and accuracy threshold.
+* Calculating error, accuracy, and recall. 📈
+* K-fold cross-validation. * Visualization of:
+* Training and testing data 📍
+* Decision boundary of the trained model 🗺️
+* Model accuracy over epochs 🎯
+* Evolution of weights during training 🏋️
+* Model error over epochs 📉
 
-## ✨ Funcionalidades Principais
+## ✨ Main Features
 
-* **Núcleo em C ⚙️:** Funções `neuron`, `fit`, `evaluate_accuracy`, `predict` e `recall` implementadas em C para eficiência.
-* **Wrapper Python 🐍:** Classe `Perceptron` em Python fácil de usar.
-* **Fontes de Dados 💾:**
-    * Utiliza o conjunto de dados Iris (filtrado para duas classes e duas características).
-    * Gera dados sintéticos para problemas de classificação (linearmente separáveis ou com ruído).
-* **Pré-processamento 🧹:**
-    * Converte problemas multiclasse para binários.
-    * Dimensiona características usando a média e o desvio padrão.
-* **Treinamento 🏋️‍♀️:**
-    * Itera até que uma precisão de referência seja atingida no conjunto de teste ou um número máximo de épocas seja alcançado.
-    * Armazena o histórico de pesos, erros e precisão.
-* **Avaliação 📊:**
-    * Calcula a precisão nos conjuntos de treinamento e teste.
-    * Realiza validação cruzada k-fold.
-* **Visualização 🖼️:** Utiliza `matplotlib` para plotar:
-    * Distribuição de dados.
-    * Limite de decisão.
-    * Curvas de aprendizado (precisão, erro, pesos).
-* **Flexibilidade 🛠️:** Permite a configuração da taxa de aprendizado, precisão de referência e parâmetros de geração de dados.
+* **C Core ⚙️:** `neuron`, `fit`, `evaluate_accuracy`, `predict` and `recall` functions, innovations in C for efficiency.
+* **Python Wrapper 🐍:** Easy-to-use `Perceptron` class in Python.
+* **Data Sources 💾:**
+* Utilize the Iris dataset (filtered for two classes and two features).
+* Synthetic data generation for classification problems (linearly separable or noisy).
+* **Preprocessing 🧹:**
+* Convert multiclass problems to binary.
+* Scale features using mean and standard deviation.
+* **Training 🏋️‍♀️:**
+* Iterate until a baseline accuracy is reached on the test set or a maximum number of epochs is reached.
+* Store historical weights, errors, and accuracy.
+* **Evaluation 📊:**
+* Calculate accuracy on the training and test sets.
+* Perform k-fold cross-validation.
+* **Visualization 🖼️:** Use `matplotlib` to plot:
+* Data distribution.
+* Decision boundary.
+* Learning curves (accuracy, error, weights).
+* **Analysis 🖼️:** * **Flexibility 🛠️:** Allows configuration of learning rate, reference accuracy and data generation parameters.
 
-## 📂 Estrutura do Projeto
+## 📂 Project Structure
 
-├── 📄 perceptron.c        # Implementação em C das funções principais do Perceptron
+├── 📄 perceptron.c # C implementation of the main Perceptron functions
 
-├── 📄 perceptron.h        # Arquivo de cabeçalho para o código C
+├── 📄 perceptron.h # Header file for the C code
 
-├── 🔗 perceptron.so       # Biblioteca compartilhada compilada (gerada após a compilação)
+├── 🔗 perceptron.so # Compiled shared library (generated after compilation)
 
-├── 🐍 data_treatment.py   # Funções para importação de dados, geração e plotagem
+├── 🐍 data_treatment.py # Functions for data import, generation and plotting
 
-├── 🐍 training.py         # Classe Perceptron em Python e interface ctypes para C
+├── 🐍 training.py # Python Perceptron class and ctypes interface for C
 
-└── 📖 main.py             # Script principal para executar o treinamento e avaliação
+└── 📖 main.py # Main script to run training and evaluation
 
-## 🛠️ Pré-requisitos
+## 🛠️ Prerequisites
 
 * Python 3.12.3 🐍
-* Compilador C (como GCC) ⚙️
-* Bibliotecas Python:
-    * `numpy`
-    * `matplotlib`
-    * `scikit-learn` (usado em `data_treatment.py` para `load_iris` e `make_classification`)
+* C compiler (like CGC) ⚙️
+* Python libraries:
+* `numpy`
+* `matplotlib`
+* `scikit-learn` (used in `data_treatment.py` for `load_iris` and `make_classification`)
 
-## 🚀 Configuração e Instalação
+## 🚀 Setup and Installation
 
-1.  **Clone o repositório:**
-    ```bash
-    git clone https://github.com/JvFg92/Perceptron_Data_Classify
-    cd Perceptron_Data_Classify
-    ```
+1. **Clone the repository:**
+```bash
+clone git https://github.com/JvFg92/Perceptron_Data_Classify
+cd Perceptron_Data_Classify
+```
 
-2.  **Compile o código C para criar a biblioteca compartilhada (`perceptron.so`):**
-    No Linux ou macOS:
-    ```bash
-    gcc -shared -o perceptron.so -fPIC perceptron.c
-    ```
-    No Windows (pode exigir ajustes dependendo do seu compilador, por exemplo, com MinGW):
-    ```bash
-    gcc -shared -o perceptron.so perceptron.c -Wl,--add-stdcall-alias
-    ```
-    ℹ️ Certifique-se de que o arquivo `perceptron.so` (ou `perceptron.dll` no Windows) resultante esteja no mesmo diretório que os scripts Python.
+2. **Compile the C code to create a shared library (`perceptron.so`):**
+On Linux or macOS:
+```bash
+gcc -shared -o perceptron.so -fPIC perceptron.c
+```
+On Windows (may require configuration depending on your compiler, e.g. with MinGW):
+```bash
+gcc -shared -o perceptron.so perceptron.c -Wl,--add-stdcall-alias
+```
+ℹ️ Make sure the resulting `perceptron.so` (or `perceptron.dll` on Windows) file is in the same directory as the Python scripts.
 
-3.  **Instale as dependências Python:**
-     ```bash
-    pip install numpy matplotlib scikit-learn
-    ```
-    
-    ⚠️ Para Linux pode ser necessário:
-    ```bash
-    sudo apt install python3-numpy
-    sudo apt install python3-matplotlib
-    sudo apt install python3-sklearn
-    ```
-    
-    ⚠️ Para Windows pode ser necessário:
-    ```bash
-    py -m pip install numpy matplotlib scikit-learn
-    ```
-    
-    ✅ Pronto para começar!
+3. **Install Python dependencies:**
+```bash
+pip install numpy matplotlib scikit-learn
+```
 
-## ▶️ Uso
+⚠️ For Linux you may need:
+```bash
+sudo apt install python3-numpy
+sudo apt install python3-matplotlib
+sudo apt install python3-sklearn
+```
 
-O script principal para executar o modelo é `main.py`.
+⚠️ For Windows you may need:
+```bash
+py -m pip install numpy matplotlib scikit-learn
+```
+
+✅ Ready to go!
+
+## ▶️ Usage
+
+The main script to run the model is `main.py`.
 ```bash
 python main.py
 ```
 
-⚠️ Para Linux pode ser necessário:
+⚠️ For Linux you may need:
 ```bash
 python3 main.py
 ```
-⚠️ Para Windows pode ser necessário:
+⚠️ For Windows you may need:
 ```bash
 py main.py
 ```
