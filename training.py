@@ -35,6 +35,8 @@ class Perceptron:
         Args:
             lr (float): Learning rate for weight updates.
             accuracy (float): Desired accuracy threshold for training.
+            generated (bool): Flag indicating if the data is generated.
+            linear (bool): Flag indicating if the model is linear.
         """
         self.generated = generated
         self.linear = linear
@@ -126,6 +128,9 @@ class Perceptron:
     def evaluate(self,X,y):
         """
         Evaluates the perceptron model on the test data.
+        Args:
+            X (numpy.ndarray): Test features.
+            y (numpy.ndarray): Test labels.
         Returns:
             accuracy (float): The accuracy of the model on the test set.
             recall (float): The recall score of the model on the test set.
@@ -191,6 +196,13 @@ class Perceptron:
     def load_data(self, X_train=None, y_train=None, X_test=None, y_test=None , gnt=False, lnr=False):
         """
         Loads the training and testing data.
+        Args:
+            X_train (numpy.ndarray): Training features.
+            y_train (numpy.ndarray): Training labels.
+            X_test (numpy.ndarray): Testing features.
+            y_test (numpy.ndarray): Testing labels.
+            gnt (bool): If True, generates diagnostic data; otherwise imports data.
+            lnr (bool): If True, uses linear data; otherwise uses non-linear data.
         """
         if X_train is None or y_train is None:
             if gnt: self.X_train, self.y_train = dt.generate_diagnostics(False, lnr)
@@ -220,6 +232,7 @@ class Perceptron:
         Performs k-fold cross-validation on the training data.
         Args:
             k (int): Number of folds for cross-validation.
+            plot (bool): If True, plots the results of cross-validation.
         Returns:
             list: List of accuracies for each fold.
             list: List of recall scores for each fold.
@@ -330,6 +343,8 @@ class Perceptron:
     def get_post_train(self, plot=False):
         """
         Returns the final training results after training.
+        Args:
+            plot (bool): If True, plots the training results.
         """
         if plot:
             self.plot_errors()

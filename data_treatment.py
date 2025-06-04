@@ -8,6 +8,10 @@ def import_data(test=False, linear=False):
   """
     This function loads the iris dataset, converts it to a binary classification problem,
     and splits it into training and testing sets.
+    Args:
+        test (bool): If True, returns the test set only.
+        linear (bool): If True, uses a linear classification problem (Iris Setosa vs. not Setosa).
+                       If False, uses a non-linear classification problem (Iris Versicolor vs. Virginica).
     Returns:
         X_train: Training features
         y_train: Training labels
