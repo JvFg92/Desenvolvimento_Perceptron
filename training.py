@@ -316,11 +316,13 @@ class Perceptron:
         print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
         print(f"Fold recall scores: {[f'{rec*100:.2f}' for rec in fold_recall_history]}")
         print(f"Mean CV recall: {np.mean(fold_recall_history)*100:.2f}%")
+        print(f"Fold cumulative errors: {[f'{err:.4f}' for err in fold_recall_error]}")
+        print(f"Mean CV cumulative error: {np.mean(fold_recall_error):.4f}")
 
         if plot:
             self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy", xlabel="Fold Number")
             self.plot_recall(rcl=fold_recall_history, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Recall", xlabel="Fold Number")
-            self.plot_errors(error=fold_recall_error, epc=range(1, k + 1))
+            self.plot_errors(error=fold_recall_error, epc=range(1, k + 1), xlabel="Fold Number")
         print("\nPerceptron state restored to pre-cross-validation.")
 
 #################################################################
@@ -383,13 +385,13 @@ class Perceptron:
 
 #################################################################
 
-    def plot_errors(self, error=None, epc=None):
+    def plot_errors(self, error=None, epc=None, xlabel="Epochs"):
         """
         Plots the training errors over epochs.
         """
         if error is None: error = self.train_errors
         if epc is None: epc = self.train_epochs
-        dt.general_plot(data=error, interval=epc, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
+        dt.general_plot(data=error, interval=epc, title="Training Errors Over Epochs", ylabel="Error", xlabel=xlabel)
 
 ##################################################################
 
