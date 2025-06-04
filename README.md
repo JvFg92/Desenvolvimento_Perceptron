@@ -77,7 +77,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git) # Substitua pela URL do seu repositório
+    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
     cd "seu-repositorio"
     ```
 
