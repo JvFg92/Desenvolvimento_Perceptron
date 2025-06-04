@@ -254,6 +254,7 @@ class Perceptron:
         
         fold_accuracies = []
         fold_recall_history = []
+        fold_recall_error = []
         num_total_samples_cv = X_internal_cv.shape[0]
         fold_size = num_total_samples_cv // k
         
@@ -288,7 +289,7 @@ class Perceptron:
              
             fold_accuracies.append(self.test_accuracy)
             fold_recall_history.append(self.recall_score)
-
+            fold_recall_error.append(self.cumulative_error)
 
         #Restore original state of the Perceptron instance
         self.X_train = original_X_train
@@ -313,12 +314,13 @@ class Perceptron:
         print("\n--- Cross-Validation Summary ---")
         print(f"Fold accuracies: {[f'{acc*100:.2f}%' for acc in fold_accuracies]}")
         print(f"Mean CV accuracy: {np.mean(fold_accuracies)*100:.2f}%")
-        print(f"Fold recall scores: {[f'{rec:.4f}' for rec in fold_recall_history]}")
+        print(f"Fold recall scores: {[f'{rec*100:.2f}' for rec in fold_recall_history]}")
         print(f"Mean CV recall: {np.mean(fold_recall_history)*100:.2f}%")
 
         if plot:
             self.plot_accuracy(acr=fold_accuracies, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Accuracy", xlabel="Fold Number")
             self.plot_recall(rcl=fold_recall_history, epc=range(1, k + 1), ttl=f"{k}-Fold Cross-Validation Recall", xlabel="Fold Number")
+            self.plot_errors(error=fold_recall_error, epc=range(1, k + 1))
         print("\nPerceptron state restored to pre-cross-validation.")
 
 #################################################################
@@ -381,11 +383,13 @@ class Perceptron:
 
 #################################################################
 
-    def plot_errors(self):
+    def plot_errors(self, error=None, epc=None):
         """
         Plots the training errors over epochs.
         """
-        dt.general_plot(self.train_errors, self.train_epochs, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
+        if error is None: error = self.train_errors
+        if epc is None: epc = self.train_epochs
+        dt.general_plot(data=error, interval=epc, title="Training Errors Over Epochs", ylabel="Error", xlabel="Epochs")
 
 ##################################################################
 
