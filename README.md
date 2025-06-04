@@ -30,7 +30,7 @@ O Perceptron é um dos algoritmos de aprendizado de máquina supervisionado mais
 
 ## ✨ Funcionalidades Principais
 
-* **Núcleo em C ⚙️:** Funções `neuron`, `fit`, `evaluate_accuracy` e `predict` implementadas em C para eficiência.
+* **Núcleo em C ⚙️:** Funções `neuron`, `fit`, `evaluate_accuracy`, `predict` e `recall` implementadas em C para eficiência.
 * **Wrapper Python 🐍:** Classe `Perceptron` em Python fácil de usar.
 * **Fontes de Dados 💾:**
     * Utiliza o conjunto de dados Iris (filtrado para duas classes e duas características).
