@@ -103,3 +103,37 @@ int *predict(double *x, double *w, int samples, int features) {
   }
   return predictions;
 }
+
+/*******************************************************************************/
+/**
+ * @brief Computes the recall of the perceptron on a dataset.
+ *
+ * @param x Pointer to the flattened input data.
+ * @param w Pointer to the weight vector.
+ * @param y Pointer to the target output vector.
+ * @param samples Number of samples in the dataset.
+ * @param features Number of features (including bias) for each sample.
+ * @return double The recall of the perceptron on the dataset.
+ */
+
+double recall(double *x, double *w, double *y, int samples, int features) {
+  int true_positive = 0;
+  int false_negative = 0;
+  int *predictions = predict(x, w, samples, features);
+
+  for (int i = 0; i < samples; i++) {
+    if (predictions[i] == 1 && y[i] == 1) {
+      true_positive++;
+    } else if (predictions[i] == 0 && y[i] == 1) {
+      false_negative++;
+    }
+  }
+
+  free(predictions);
+  
+  if (true_positive + false_negative == 0) {
+    return 0.0; 
+  }
+  
+  return (double)true_positive / (true_positive + false_negative);
+}

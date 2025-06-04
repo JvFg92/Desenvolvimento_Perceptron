@@ -1,7 +1,6 @@
 import ctypes
 import data_treatment as dt
 import numpy as np
-from sklearn.metrics import recall_score
 
 #Using ctypes to load the shared library
 lib = ctypes.CDLL("./perceptron.so")
@@ -17,9 +16,15 @@ lib.fit.restype = ctypes.c_double
 lib.evaluate_accuracy.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_int]
 lib.evaluate_accuracy.restype = ctypes.c_double
 
+#Recall Score Function
+lib.recall.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_int]
+lib.recall.restype = ctypes.c_double
+
 #Predict Function
 lib.predict.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), ctypes.c_int, ctypes.c_int]
 lib.predict.restype = ctypes.POINTER(ctypes.c_int)
+
+
 
 #################################################################
 
@@ -123,6 +128,7 @@ class Perceptron:
         Evaluates the perceptron model on the test data.
         Returns:
             accuracy (float): The accuracy of the model on the test set.
+            recall (float): The recall score of the model on the test set.
         """
         if X is None or y is None or self.weights is None:
             print("Error: Test data or weights not loaded/initialized.")
@@ -140,10 +146,14 @@ class Perceptron:
             num_test_samples,                                              
             self.features + 1           # Number of features including bias
         )
-        predictions = self.think(X_test_bias)
-        predictions = predictions.astype(np.double)
         
-        recall=recall_score(y, predictions, zero_division=0)
+        recall= lib.recall(
+            X_test_bias.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),  
+            self.weights.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),              
+            y.ctypes.data_as(ctypes.POINTER(ctypes.c_double)),                                               
+            num_test_samples,                                               
+            self.features + 1                                       
+        )
 
         return acr, recall
 
