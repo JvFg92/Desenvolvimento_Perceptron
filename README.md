@@ -76,7 +76,7 @@ Perceptron is one of the simplest supervised machine learning algorithms for bin
 
 1. **Clone the repository:**
 ```bash
-clone git https://github.com/JvFg92/Perceptron_Data_Classify
+git clone https://github.com/JvFg92/Perceptron_Data_Classify
 cd Perceptron_Data_Classify
 ```
 
